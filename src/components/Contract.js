@@ -20,34 +20,35 @@ export const Contract = ({ near, update, account }) => {
     const [flips, setFlips] = useState([]);
 
     useEffect(() => {
-        updateCredits();
+        updateBalance();
     }, []);
 
-    const updateCredits = async () => {
+    const updateBalance = async () => {
         const contract = getContract(account);
-        setCredits(await contract.get_credits({ account_id: account.accountId }))
+        setCredits(await contract.get_balance())
     };
 
     const handleDeposit = async () => {
         const contract = getContract(account);
         await contract.deposit({}, GAS, parseNearAmount(amount))
-        updateCredits()
+        updateBalance()
     };
 
     const handlePlay = async () => {
         const contract = getContract(account);
+        await contract.deposit({}, GAS, parseNearAmount(amount))
         const outcome = await contract.play({}, GAS)
         flips.push(outcome < 128)
-        updateCredits()
+        updateBalance()
     };
 
     return <>
         <h3>Play</h3>
         <p>Current Credits: { formatNearAmount(credits, 0) }</p>
-        <input placeholder="Credits (N)" value={amount} onChange={(e) => setAmount(e.target.value)} />
-        <br />
+        <input placeholder="Bet Amount (N)" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        {/* <br />
         <button onClick={() => handleDeposit()}>Buy Credits</button>
-        <br />
+        <br /> */}
         <br />
         <button onClick={() => handlePlay()}>Play Jackpot</button>
         {

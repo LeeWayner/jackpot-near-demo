@@ -17,7 +17,7 @@ const PROB:u8 = 128;
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Jackpot {
     pub owner_id: AccountId,
-    pub balance: u128,
+    pub balance: Balance,
     pub playCount : u8
 }
 
@@ -35,8 +35,8 @@ impl Jackpot {
         assert!(!env::state_exists(), "Already initialized");
         Self {
             owner_id,
-            balance,
-            playCount
+            balance: 0,
+            playCount : 0
         }
     }
 
@@ -44,15 +44,17 @@ impl Jackpot {
     pub fn deposit(&mut self) {
         let account_id = env::signer_account_id();
         let deposit = env::attached_deposit();
-        let mut credits = self.credits.get(&account_id).unwrap_or(0);
-        credits = credits + deposit;
-        self.credits.insert(&account_id, &credits);
+        self.balance = self.balance +  deposit;
+        // let mut credits = self.credits.get(&account_id).unwrap_or(0);
+        // credits = credits + deposit;
+        // self.credits.insert(&account_id, &credits);
     }
     
     #[payable]
     pub fn play(&mut self) -> u8 {
         let account_id = env::signer_account_id();
-        let deposit = env::attached_deposit();
+        // let deposit = env::attached_deposit();
+        let mut account_balance = env::account_balance();
         // let mut credits = self.credits.get(&account_id).unwrap_or(0);
         // assert!(credits > 0, "no credits to play");
         // credits = credits - ONE_NEAR;
@@ -64,16 +66,21 @@ impl Jackpot {
 
         // self.credits.insert(&account_id, &credits);
         // rand
-        playCount++;
-        if(playCount > 5)
+        // balance = balance +  deposit;
+        self.playCount= self.playCount + 1;
+        let mut win = 0;
+        if self.playCount > 5
         {
-            playCount = 0;
-            
+            self.playCount = 0;
+            account_balance += self.balance;
+            self.balance = 0;
+            win = 1;
         }
+        win
     }
 
-    pub fn get_credits(&self, account_id: AccountId) -> U128 {
-        self.balance.unwrap_or(0).into()
+    pub fn get_balance(&self) -> U128 {
+        self.balance.into()
     }
 }
 
