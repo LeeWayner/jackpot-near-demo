@@ -15,26 +15,28 @@ const PROB:u8 = 128;
 #[near_bindgen]
 
 #[derive(BorshDeserialize, BorshSerialize)]
-pub struct SlotMachine {
+pub struct Jackpot {
     pub owner_id: AccountId,
-    pub credits: UnorderedMap<AccountId, Balance>,
+    pub balance: u128,
+    pub playCount : u8
 }
 
-impl Default for SlotMachine {
+impl Default for Jackpot {
     fn default() -> Self {
         panic!("Should be initialized before usage")
     }
 }
 
 #[near_bindgen]
-impl SlotMachine {
+impl Jackpot {
     #[init]
     pub fn new(owner_id: AccountId) -> Self {
         assert!(env::is_valid_account_id(owner_id.as_bytes()), "Invalid owner account");
         assert!(!env::state_exists(), "Already initialized");
         Self {
             owner_id,
-            credits: UnorderedMap::new(b"credits".to_vec()),
+            balance,
+            playCount
         }
     }
 
@@ -47,23 +49,31 @@ impl SlotMachine {
         self.credits.insert(&account_id, &credits);
     }
     
+    #[payable]
     pub fn play(&mut self) -> u8 {
         let account_id = env::signer_account_id();
-        let mut credits = self.credits.get(&account_id).unwrap_or(0);
-        assert!(credits > 0, "no credits to play");
-        credits = credits - ONE_NEAR;
+        let deposit = env::attached_deposit();
+        // let mut credits = self.credits.get(&account_id).unwrap_or(0);
+        // assert!(credits > 0, "no credits to play");
+        // credits = credits - ONE_NEAR;
         
-        let rand: u8 = *env::random_seed().get(0).unwrap();
-        if rand < PROB {
-            credits = credits + 10 * ONE_NEAR;
-        }
+        // let rand: u8 = *env::random_seed().get(0).unwrap();
+        // if rand < PROB {
+        //     credits = credits + 10 * ONE_NEAR;
+        // }
 
-        self.credits.insert(&account_id, &credits);
-        rand
+        // self.credits.insert(&account_id, &credits);
+        // rand
+        playCount++;
+        if(playCount > 5)
+        {
+            playCount = 0;
+            
+        }
     }
 
     pub fn get_credits(&self, account_id: AccountId) -> U128 {
-        self.credits.get(&account_id).unwrap_or(0).into()
+        self.balance.unwrap_or(0).into()
     }
 }
 

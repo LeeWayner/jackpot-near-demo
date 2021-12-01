@@ -49,8 +49,7 @@ export const Contract = ({ near, update, account }) => {
         <button onClick={() => handleDeposit()}>Buy Credits</button>
         <br />
         <br />
-        <button onClick={() => handlePlay()}>Flip</button>
-
+        <button onClick={() => handlePlay()}>Play Jackpot</button>
         {
             flips.map((f, i) => f ? <p key={i}>Won</p> : <p key={i}>Lost</p>)
         }
