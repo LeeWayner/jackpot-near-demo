@@ -14,18 +14,18 @@ const PROB:u8 = 128;
 
 #[near_bindgen]
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(Default, BorshDeserialize, BorshSerialize)]
 pub struct Jackpot {
     pub owner_id: AccountId,
     pub balance: Balance,
     pub playCount : u8
 }
 
-impl Default for Jackpot {
-    fn default() -> Self {
-        panic!("Should be initialized before usage")
-    }
-}
+// impl Default for Jackpot {
+//     fn default() -> Self {
+//         panic!("Should be initialized before usage")
+//     }
+// }
 
 #[near_bindgen]
 impl Jackpot {
@@ -53,26 +53,15 @@ impl Jackpot {
     #[payable]
     pub fn play(&mut self) -> u8 {
         let account_id = env::signer_account_id();
-        // let deposit = env::attached_deposit();
-        let mut account_balance = env::account_balance();
-        // let mut credits = self.credits.get(&account_id).unwrap_or(0);
-        // assert!(credits > 0, "no credits to play");
-        // credits = credits - ONE_NEAR;
-        
-        // let rand: u8 = *env::random_seed().get(0).unwrap();
-        // if rand < PROB {
-        //     credits = credits + 10 * ONE_NEAR;
-        // }
+        let deposit = env::attached_deposit();
 
-        // self.credits.insert(&account_id, &credits);
-        // rand
-        // balance = balance +  deposit;
         self.playCount= self.playCount + 1;
         let mut win = 0;
+        self.balance = self.balance +  deposit;
         if self.playCount > 5
         {
             self.playCount = 0;
-            account_balance += self.balance;
+            Promise::new(account_id).transfer(self.balance);
             self.balance = 0;
             win = 1;
         }

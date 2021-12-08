@@ -27,22 +27,22 @@ describe('deploy contract ' + contractName, () => {
 	});
 
 	test('check deposit', async () => {
-        contract = await getContract(alice)
+		contract = await getContract(alice);
 		await contract.deposit({}, GAS, parseNearAmount('19'));
-        const credits = await contract.get_credits({ account_id: alice.accountId })
-        expect(credits).toEqual(parseNearAmount('19'))
+		const credits = await contract.get_credits({ account_id: alice.accountId });
+		expect(credits).toEqual(parseNearAmount('19'));
 	});
 
 	test('check play', async () => {
-        
-        for (let i = 0; i < 5; i++) {
-            const rand = await contract.play({}, GAS);
-            console.log(rand)
-            const credits = await contract.get_credits({ account_id: alice.accountId })
-            console.log(credits)
-        }
+        contract = await getContract(alice);
+		for (let i = 0; i < 5; i++) {
+			const rand = await contract.play({}, GAS);
+			console.log(rand);
+			const credits = await contract.get_credits({ account_id: alice.accountId });
+			console.log(credits);
+		}
 
-        expect(true)
+		expect(true);
 	});
 
 
